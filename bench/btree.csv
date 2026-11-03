@@ -1,0 +1,21 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: nodeSize","Param: size"
+"learnedindex.BTreeBench.binarySearch","avgt",1,10,54.012696,1.837679,"ns/op",,1000
+"learnedindex.BTreeBench.binarySearch","avgt",1,10,106.533785,1.357600,"ns/op",,64000
+"learnedindex.BTreeBench.binarySearch","avgt",1,10,256.123863,22.163454,"ns/op",,1000000
+"learnedindex.BTreeBench.binarySearch","avgt",1,10,803.647710,32.275671,"ns/op",,10000000
+"learnedindex.BTreeBench.btree","avgt",1,10,37.830019,0.815174,"ns/op",8,1000
+"learnedindex.BTreeBench.btree","avgt",1,10,64.565504,5.623472,"ns/op",8,64000
+"learnedindex.BTreeBench.btree","avgt",1,10,231.183029,17.661222,"ns/op",8,1000000
+"learnedindex.BTreeBench.btree","avgt",1,10,618.883774,73.931492,"ns/op",8,10000000
+"learnedindex.BTreeBench.btree","avgt",1,10,39.959419,2.538993,"ns/op",16,1000
+"learnedindex.BTreeBench.btree","avgt",1,10,69.631659,1.394144,"ns/op",16,64000
+"learnedindex.BTreeBench.btree","avgt",1,10,180.154146,17.632387,"ns/op",16,1000000
+"learnedindex.BTreeBench.btree","avgt",1,10,454.765825,9.495421,"ns/op",16,10000000
+"learnedindex.BTreeBench.btree","avgt",1,10,40.486437,0.537604,"ns/op",32,1000
+"learnedindex.BTreeBench.btree","avgt",1,10,77.623968,1.335043,"ns/op",32,64000
+"learnedindex.BTreeBench.btree","avgt",1,10,183.947567,21.368103,"ns/op",32,1000000
+"learnedindex.BTreeBench.btree","avgt",1,10,434.538793,37.992587,"ns/op",32,10000000
+"learnedindex.BTreeBench.btree","avgt",1,10,49.809156,4.033424,"ns/op",64,1000
+"learnedindex.BTreeBench.btree","avgt",1,10,92.557736,7.847386,"ns/op",64,64000
+"learnedindex.BTreeBench.btree","avgt",1,10,216.041164,38.159239,"ns/op",64,1000000
+"learnedindex.BTreeBench.btree","avgt",1,10,524.348072,16.442428,"ns/op",64,10000000

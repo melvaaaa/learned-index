@@ -12,12 +12,16 @@ Based on Kraska et al., *The Case for Learned Index Structures* (SIGMOD 2018). T
 
 ![Binary search: time per lookup, pinned to two E-cores](bench/binary-search-ecores.png)
 
+**Step 3, B-tree (2026-11-04):** A read-only B-tree beats binary search at every size, by 1.8× at 10 million keys (435 vs. 804 ns). The best node size depends on the array: 8 keys (one cache line) for small arrays, but 16–32 keys for big ones, because fewer levels mean fewer trips to RAM.
+
+![B-tree vs. binary search](bench/btree.png)
+
 ## Plan
 
 1. Binary search as baseline: done
 2. Make the measurements reliable: done
-3. B-tree with different node sizes: next
-4. Learned index: one line, then many lines (piecewise linear)
+3. B-tree with different node sizes: done
+4. Learned index: one line, then many lines (piecewise linear): next
 5. Comparison on evenly spread keys: time and memory
 6. Data that breaks the learned index
 7. Write-up
