@@ -1,0 +1,17 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: size"
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,51.952370,0.824730,"ns/op",1000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,58.699779,1.276000,"ns/op",4000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,74.462626,1.886339,"ns/op",16000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,91.812032,1.743173,"ns/op",64000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,114.091004,2.587405,"ns/op",256000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,190.795007,13.249708,"ns/op",1000000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,466.739551,30.327449,"ns/op",4000000
+"learnedindex.BinarySearchBench.jdk","avgt",1,10,653.156695,22.500648,"ns/op",10000000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,52.289718,1.015338,"ns/op",1000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,59.549978,1.566783,"ns/op",4000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,86.921051,14.228854,"ns/op",16000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,139.108037,33.879002,"ns/op",64000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,163.015203,24.177683,"ns/op",256000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,374.409215,112.454235,"ns/op",1000000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,774.580145,100.655063,"ns/op",4000000
+"learnedindex.BinarySearchBench.mine","avgt",1,10,909.238710,118.561610,"ns/op",10000000

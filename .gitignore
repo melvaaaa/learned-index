@@ -1,0 +1,12 @@
+target/
+*.class
+.venv/
+__pycache__/
+# Eclipse
+.project
+.classpath
+.settings/
+# IntelliJ / VS Code
+.idea/
+*.iml
+.vscode/
