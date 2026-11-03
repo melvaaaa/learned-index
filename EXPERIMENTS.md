@@ -36,6 +36,37 @@ One entry per experiment, newest at the bottom. Failed attempts stay in.
 
 **Next step.** Pin the benchmark to one fast core, run "mine" and "jdk" in the opposite order, and check if the difference and the big error bars go away.
 
+## 2026-11-04: Step 2, making the measurement reliable
+
+**Question.** In the baseline, "mine" and "jdk" (same algorithm) differed by up to 2×. That can't come from the code. Where does the noise come from, and how do I get rid of it?
+
+**Hypothesis.** My CPU has 2 fast cores (P-cores) and 10 slower ones (E-cores). Windows moves the benchmark between them. If I pin the benchmark to one P-core, the noise should go away.
+
+**Setup.**
+- Same benchmark and settings as the baseline
+- Read the core layout with the Windows function `GetLogicalProcessorInformationEx`: P-cores are logical CPUs 0–1 and 10–11, the rest are E-cores
+- Pinned with `start /affinity` (checked that the JMH child processes inherit the pinning)
+- Three runs: not pinned (baseline), pinned to one P-core (CPUs 10–11), pinned to two E-cores (CPUs 5–6)
+- In the background: the Claude desktop app and the Opera browser, together about half a core of CPU time
+
+**Result.** Raw data: `bench/binary-search*.csv`, plots: `bench/binary-search*.png`.
+
+| run | typical error bar (median) | biggest error bar | average gap mine vs. jdk | biggest gap |
+|---|---|---|---|---|
+| not pinned | 6% | 30% | 39% | 96% |
+| one P-core | 29% | 185% | 44% | 168% |
+| two E-cores | **5%** | 26% | **3%** | **8%** |
+
+- **The hypothesis was wrong.** Pinning to a fast core made the measurement much *worse*.
+- Pinning to two slow cores fixed it: "mine" and "jdk" now agree at every size within a few percent, which is what you expect from the same algorithm.
+- On the E-cores the absolute times are a bit higher at large sizes (e.g. 816 ns instead of 653 ns at 10 million keys). The shape of the curve stays the same.
+
+**What I learned.**
+- For a benchmark, a quiet core matters more than a fast core. My best explanation: Windows prefers to run the apps I'm using (browser, desktop app) on the fast cores. When I pin the benchmark there, it has to share the core with them. When it's not pinned, it at least can move away. On the E-cores it mostly has the cores to itself. I didn't prove this directly (I didn't record which program ran on which core), so it stays an explanation for now.
+- Measurements need a check like "mine vs. jdk": two versions that *must* be equal. Without it I wouldn't have noticed how bad the first measurement was.
+
+**Next step.** All further benchmarks run with `bench\run-pinned.cmd` (pinned to the two E-cores). Then: build the B-tree.
+
 ## Template
 
 ### YYYY-MM-DD: <title>
