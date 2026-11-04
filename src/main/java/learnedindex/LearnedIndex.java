@@ -110,6 +110,17 @@ public final class LearnedIndex {
         return max;
     }
 
+    /** Number of segments that got at least one key from the root line. */
+    public int usedSegments() {
+        int used = 0;
+        for (int s = 0; s < segments; s++) {
+            if (maxError[s] >= minError[s]) {
+                used++;
+            }
+        }
+        return used;
+    }
+
     /** Average search window when every key is looked up once, in keys. */
     public double averageWindow() {
         if (keys.length == 0) {

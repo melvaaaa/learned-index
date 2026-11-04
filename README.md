@@ -20,6 +20,12 @@ Based on Kraska et al., *The Case for Learned Index Structures* (SIGMOD 2018). T
 
 ![Learned index vs. B-tree vs. binary search](bench/learned-index.png)
 
+**Step 6, breaking the learned index (2026-11-04):** On five kinds of data the B-tree stays at ~470–560 ns every time. The learned index ranges from 175 ns to 730 ns. **A single extreme key** (one outlier in 10 million) pulls its root line off, so only 2 of 65,536 segments get used, and it ends up slower than the B-tree. With 100 clusters only 100 segments get used, but it still wins.
+
+![What the data looks like](bench/distributions-shape.png)
+
+![Time per lookup by data distribution](bench/distributions.png)
+
 ## Plan
 
 1. Binary search as baseline: done
@@ -27,8 +33,8 @@ Based on Kraska et al., *The Case for Learned Index Structures* (SIGMOD 2018). T
 3. B-tree with different node sizes: done
 4. Learned index: one line, then many lines (piecewise linear): done
 5. Comparison on evenly spread keys: time and memory: done (part of step 4)
-6. Data that breaks the learned index: next
-7. Write-up
+6. Data that breaks the learned index: done
+7. Write-up: next
 
 ## Reproduce
 

@@ -144,6 +144,46 @@ Average search window (keys) and model size at 10 million keys:
 
 **Next step.** Step 5 is mostly done by this run (time and memory on evenly spread keys). So next: step 6, data that breaks the learned index.
 
+## 2026-11-04: Step 6, data that breaks the learned index
+
+**Question.** So far the keys were almost a straight line, the best case for a learned index. What happens on data that is not? And does the B-tree care at all?
+
+**Expectation.** The B-tree doesn't look at the values, only at their order, so its speed should not depend on the distribution. The learned index should get slower the less the data looks like a line, because its windows get bigger.
+
+**Setup.**
+- 5 distributions with 10 million keys each (`KeyDistributions`), shapes in `bench/distributions-shape.png`:
+  - **uniform:** random gaps of 1–100 (the data from before)
+  - **lognormal:** mostly small gaps, sometimes huge ones
+  - **quadratic:** key = i², dense at the start, sparse at the end, so position follows a curve
+  - **clusters:** 100 dense groups, far apart
+  - **outlier:** the uniform keys, but the last key is 2^60
+- 11 new tests: every distribution is sorted and distinct, and all structures still find every key on it. 70 tests in total, all pass.
+- Window sizes and used segments from `DistributionStats`: `bench/distributions-stats.txt`
+- Same JMH settings, pinned to two E-cores
+
+**Result.** Raw data: `bench/distributions.csv`, plot: `bench/distributions.png`.
+
+| data | binary search | B-tree 16 | learned 1,024 | learned 65,536 | avg window (65,536) | used segments (65,536) |
+|---|---|---|---|---|---|---|
+| uniform | 1175 ns | 556 ns | 234 ns | **178 ns** | 9 | 65,536 |
+| lognormal | 1157 ns | 508 ns | 575 ns | **250 ns** | 39 | 63,780 |
+| quadratic | 1063 ns | 469 ns | 302 ns | **175 ns** | 467 | 53,249 |
+| clusters | 994 ns | 500 ns | **320 ns** | 323 ns | 197 | 100 |
+| outlier | 997 ns | **541 ns** | 728 ns | 717 ns | 1,937 | 2 |
+
+- **The B-tree really doesn't care:** 469–556 ns on all five, within the error bars.
+- **One single key breaks the learned index.** With the outlier, the root line has to reach from ~500 million to 2^60. All other keys land on almost the same spot, so only 2 of 65,536 segments get used. The learned index falls back to "one line" speed (717 ns) and is now **slower than the B-tree**.
+- **Clusters:** only 100 of 65,536 segments get used (one per cluster), so more segments don't help at all (320 vs. 323 ns). It still beats the B-tree, because inside each cluster the keys are evenly spread again.
+- **Lognormal:** with 1,024 segments the learned index is slower than the B-tree (575 vs. 508 ns, the error bars almost touch). With 65,536 it wins again.
+- Binary search was noisier and slower in this run than before (±20%, ~1,000–1,175 ns instead of ~840 ns). It ran first. The big differences between the structures are much larger than this noise, the small ones (lognormal, B-tree vs. learned 1,024) are not.
+
+**What I learned.**
+- The learned index depends on *two* things: whether each segment's data is close to a line, and whether the root line spreads the keys over the segments. The outlier and the clusters attack the second one. That is the weak spot: the root is a single least-squares line, and one extreme value can pull it completely off.
+- Least squares is very sensitive to outliers. A fix could be a root model that ignores extreme keys (e.g. built on the middle 99.9% of the keys, with the rest searched separately), or segments of equal size instead of a root line. Not tried yet.
+- The B-tree's worst case is the same as its best case. The learned index can be 3× faster or 1.3× slower than the B-tree, depending on data you might not control.
+
+**Open question.** Quadratic has an average window of 467 keys, but it is as fast as uniform with a window of 9. I can't explain this yet. Next idea: measure time per lookup grouped by window size.
+
 ## Template
 
 ### YYYY-MM-DD: <title>
