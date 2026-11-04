@@ -85,6 +85,16 @@ class BinarySearchTest {
     }
 
     @Test
+    void rangeSearchOnlyLooksInsideTheRange() {
+        long[] a = {2, 4, 6, 8, 10, 12};
+        assertEquals(2, BinarySearch.find(a, 6, 1, 3));
+        assertEquals(1, BinarySearch.find(a, 4, 1, 1));
+        assertEquals(-1, BinarySearch.find(a, 2, 1, 5)); // present, but left of the range
+        assertEquals(-1, BinarySearch.find(a, 12, 0, 4)); // present, but right of the range
+        assertEquals(-1, BinarySearch.find(a, 6, 3, 2)); // empty range
+    }
+
+    @Test
     void randomQueriesMatchTheJdk() {
         Random rnd = new Random(2);
         for (int round = 0; round < 50; round++) {

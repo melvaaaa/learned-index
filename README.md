@@ -16,14 +16,18 @@ Based on Kraska et al., *The Case for Learned Index Structures* (SIGMOD 2018). T
 
 ![B-tree vs. binary search](bench/btree.png)
 
+**Step 4, learned index (2026-11-04):** Straight lines that predict a key's position, plus a small search window around the guess. With 65,536 lines it takes 183 ns at 10 million keys: 2.5× faster than the B-tree and 4.6× faster than binary search, with less extra memory than the B-tree. One line alone is not enough (728 ns). The keys here are friendly (almost a straight line), the next step tries data that isn't.
+
+![Learned index vs. B-tree vs. binary search](bench/learned-index.png)
+
 ## Plan
 
 1. Binary search as baseline: done
 2. Make the measurements reliable: done
 3. B-tree with different node sizes: done
-4. Learned index: one line, then many lines (piecewise linear): next
-5. Comparison on evenly spread keys: time and memory
-6. Data that breaks the learned index
+4. Learned index: one line, then many lines (piecewise linear): done
+5. Comparison on evenly spread keys: time and memory: done (part of step 4)
+6. Data that breaks the learned index: next
 7. Write-up
 
 ## Reproduce

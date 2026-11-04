@@ -103,6 +103,47 @@ Levels at 10 million keys: 8 (node size 8), 6 (16), 5 (32), 4 (64).
 
 **Next step.** Build the learned index and compare it with the B-tree with node size 16 or 32.
 
+## 2026-11-04: Step 4, learned index
+
+**Question.** Instead of searching, can a straight line *predict* where a key is? And how many lines do I need to beat the B-tree?
+
+**Idea.** In a sorted array, position grows with the key. If the keys are spread evenly, a line `position ≈ slope × key + intercept` is a good guess. The index remembers how far the line is off at worst, then only binary-searches that small window. With one line the window can be big. With many lines (one per segment), each line only has to fit a small part of the data, so the windows should get much smaller.
+
+**Setup.**
+- `LearnedIndex`: least-squares lines. With 1 segment: one line for everything. With more segments: a root line picks the segment, then the segment's own line predicts the position (two-stage model as in Kraska et al.).
+- Every key in the array is always found, because the window is computed from the same predictions as the lookup. A bad line only makes the window bigger, never wrong.
+- First version cut predictions off (4999.9999 became 4999). Switched to rounding, otherwise perfectly evenly spaced keys still got a window of 2 instead of 1.
+- 23 new tests, 59 in total, all pass. Same keys, queries and JMH settings as before, pinned to two E-cores.
+- Compared: binary search, B-tree (node size 16), learned index with 1, 1,024 and 65,536 segments
+- Window sizes and memory from `LearnedIndexStats`: `bench/learned-index-stats.txt`
+
+**Result.** Raw data: `bench/learned-index.csv`, plot: `bench/learned-index.png`.
+
+| keys | binary search | B-tree 16 | learned, 1 line | learned, 1,024 | learned, 65,536 |
+|---|---|---|---|---|---|
+| 1,000 | 54 ns | 40 ns | 34 ns | **16 ns** | 20 ns |
+| 64,000 | 107 ns | 70 ns | 63 ns | 47 ns | **26 ns** |
+| 1,000,000 | 257 ns | 189 ns | 195 ns | **98 ns** | 111 ns |
+| 10,000,000 | 844 ns | 466 ns | 728 ns | 221 ns | **183 ns** |
+
+Average search window (keys) and model size at 10 million keys:
+
+| | 1 line | 1,024 lines | 65,536 lines | B-tree 16 |
+|---|---|---|---|---|
+| avg window | 1,937 | 67 | 9 | – |
+| extra memory | ~0 KB | 24 KB | 1.5 MB | 5.1 MB |
+
+- With enough segments the learned index wins clearly. At 10 million keys: **183 ns, 2.5× faster than the B-tree and 4.6× faster than binary search**, with less than a third of the B-tree's extra memory.
+- One line alone is not enough for big arrays (728 ns, almost as slow as binary search).
+- More segments is not always better: at 1 million keys, 1,024 segments (98 ns) beat 65,536 (111 ns).
+
+**What I learned.**
+- One line at 10 million keys still leaves a window of ~1,900 keys (15 KB). Searching it takes ~11 steps, and those are exactly the expensive steps: in a normal binary search the first steps are cached anyway, the *last* steps go to RAM. One line only saves the cheap steps.
+- The model itself has to fit in the cache. 1,024 segments are 24 KB, always in cache. 65,536 segments are 1.5 MB, bigger than the L2 cache, so looking up the segment's line can itself be a cache miss. That's why the bigger model only pays off when the array is so big that the smaller windows save more RAM trips than the model costs.
+- These keys are friendly for a learned index: random gaps of 1–100 are almost a straight line. The real test is data that is *not* like a line.
+
+**Next step.** Step 5 is mostly done by this run (time and memory on evenly spread keys). So next: step 6, data that breaks the learned index.
+
 ## Template
 
 ### YYYY-MM-DD: <title>

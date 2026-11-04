@@ -13,8 +13,14 @@ public final class BinarySearch {
      * <p>Contract: {@code sorted} is in ascending order and contains no duplicates.
      */
     public static int find(long[] sorted, long key) {
-        int lo = 0;
-        int hi = sorted.length - 1;
+        return find(sorted, key, 0, sorted.length - 1);
+    }
+
+    /**
+     * Like {@link #find(long[], long)}, but only looks at positions {@code lo} to {@code hi} (both inclusive).
+     * Used by the learned index, which knows a small window where the key must be.
+     */
+    public static int find(long[] sorted, long key, int lo, int hi) {
         while (lo <= hi) {
             // Unsigned shift instead of (lo + hi) / 2: the sum can overflow for very large arrays.
             // The JDK had exactly this bug until 2006.
